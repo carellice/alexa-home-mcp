@@ -138,25 +138,47 @@ Se vuoi tenerlo come promemoria, salvalo in un file chiamato `url-connettore.txt
 3. Scrivi, per esempio: "Che dispositivi ho su Alexa?" e poi "Accendi la luce del salotto".
 4. Alla richiesta di permesso scegli **Consenti sempre**.
 
-### 9. Avvio automatico
+### 9. Avvio automatico all'accensione
+
+Perché tutto riparta da solo dopo un riavvio servono quattro cose: il server, Tailscale, l'accesso automatico all'utente e il computer che non va in stop.
 
 Ferma prima il server avviato a mano (Ctrl+C).
 
 **Mac**
 
-Doppio click su `avvia.command`. Se macOS lo blocca: tasto destro → Apri.
+1. **Server**: doppio click su `avvia.command`. Se macOS lo blocca: tasto destro → Apri. Lo script registra da solo il servizio di avvio automatico (`~/Library/LaunchAgents/com.claude-alexa.server.plist`) con i percorsi giusti. Se sposti la cartella, usa `ferma.command` e poi di nuovo `avvia.command`.
+2. **Tailscale**: icona di Tailscale nella barra dei menu → Impostazioni → attiva l'avvio al login. Funnel (passo 5) riparte insieme a Tailscale, non va rilanciato.
+3. **Accesso automatico**: il server parte al login, non all'accensione. Se il Mac si riavvia da solo (aggiornamento, blackout) resta fermo alla schermata di accesso. Per evitarlo: Impostazioni di Sistema → Utenti e gruppi → **Accedi automaticamente come**. L'opzione non è disponibile con FileVault attivo.
+4. **Niente stop**: Impostazioni di Sistema → Energia (sui portatili: Batteria → Opzioni) → attiva **Impedisci lo stop automatico quando il monitor è spento** e, se presente, **Riavvia automaticamente dopo un'interruzione di corrente**. In alternativa, da terminale:
 
-Lo script registra da solo il servizio di avvio automatico (`~/Library/LaunchAgents/com.claude-alexa.server.plist`) con i percorsi giusti. Se sposti la cartella, usa `ferma.command` e poi di nuovo `avvia.command`.
+   ```bash
+   sudo pmset -a sleep 0 autorestart 1
+   ```
+
+   Un portatile con il coperchio chiuso va comunque in stop, a meno che sia alimentato e collegato a un monitor esterno.
 
 **Windows**
 
-In PowerShell, correggendo il percorso (senza spazi):
+1. **Server**: in PowerShell, correggendo il percorso (senza spazi):
 
-```powershell
-schtasks /create /tn "ClaudeAlexa" /sc onlogon /tr "C:\percorso\claude-alexa\avvia.bat auto"
-```
+   ```powershell
+   schtasks /create /tn "ClaudeAlexa" /sc onlogon /tr "C:\percorso\claude-alexa\avvia.bat auto"
+   ```
 
-Poi doppio click su `avvia.bat`. Per togliere l'avvio automatico: `schtasks /delete /tn "ClaudeAlexa" /f`.
+   Poi doppio click su `avvia.bat`. Per togliere l'avvio automatico: `schtasks /delete /tn "ClaudeAlexa" /f`.
+2. **Tailscale**: parte già da solo come servizio di Windows. Per tenerlo connesso anche prima del login: icona di Tailscale nell'area di notifica → Preferences → **Run unattended**. Funnel (passo 5) riparte insieme a Tailscale.
+3. **Accesso automatico**: il server parte al login, non all'accensione. Premi Win+R, scrivi `netplwiz`, togli la spunta da **Per utilizzare questo computer è necessario che l'utente immetta il nome e la password** e conferma con la password. Se la spunta non compare, disattiva prima l'accesso con Windows Hello in Impostazioni → Account → Opzioni di accesso.
+4. **Niente sospensione**: Impostazioni → Sistema → Alimentazione → Schermo e sospensione → sospensione **Mai** quando è collegato alla corrente. In alternativa, da PowerShell:
+
+   ```powershell
+   powercfg /change standby-timeout-ac 0
+   ```
+
+Con l'accesso automatico chiunque accenda il computer entra senza password: attivalo solo se il computer sta in un posto sicuro.
+
+**Verifica**
+
+Riavvia il computer e non toccarlo. Dopo un paio di minuti chiedi a Claude dal telefono "Che dispositivi ho su Alexa?": se risponde, parte tutto da solo.
 
 ---
 
@@ -164,7 +186,7 @@ Poi doppio click su `avvia.bat`. Per togliere l'avvio automatico: `schtasks /del
 
 ### Uso quotidiano
 
-- Il server parte da solo al login e, su Mac, si riavvia se va in crash.
+- Il server parte da solo al login e, su Mac, si riavvia se va in crash. Per farlo ripartire anche dopo un riavvio del computer senza toccare nulla, vedi il [passo 9](#9-avvio-automatico-allaccensione).
 - Funziona solo con il computer acceso e non in stop.
 - Mac: `avvia.command` e `ferma.command`. Lo stop vale fino al prossimo avvio manuale o al prossimo login. Log: `~/Library/Logs/claude-alexa.log`
 - Windows: `avvia.bat` e `ferma.bat`. Log: `server.log` nella cartella.
