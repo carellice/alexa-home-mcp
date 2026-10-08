@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Logo: una casa con un altoparlante intelligente e un fumetto di chat">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f766e"/>
+      <stop offset="1" stop-color="#1e3a8a"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="url(#bg)"/>
+  <!-- casa -->
+  <path d="M52 122 L128 56 L204 122 V192 a12 12 0 0 1 -12 12 H64 a12 12 0 0 1 -12 -12 Z"
+        fill="none" stroke="#ffffff" stroke-width="14" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- altoparlante intelligente visto dall'alto -->
+  <circle cx="128" cy="150" r="26" fill="none" stroke="#5eead4" stroke-width="10"/>
+  <circle cx="128" cy="150" r="7" fill="#ffffff"/>
+  <!-- fumetto di chat -->
+  <path d="M170 34 h44 a14 14 0 0 1 14 14 v22 a14 14 0 0 1 -14 14 h-20 l-14 14 v-14 h-10 a14 14 0 0 1 -14 -14 v-22 a14 14 0 0 1 14 -14 Z"
+        fill="#f59e0b" stroke="url(#bg)" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="179" cy="59" r="4.5" fill="#ffffff"/>
+  <circle cx="192" cy="59" r="4.5" fill="#ffffff"/>
+  <circle cx="205" cy="59" r="4.5" fill="#ffffff"/>
+</svg>

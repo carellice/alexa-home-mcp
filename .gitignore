@@ -1,0 +1,8 @@
+node_modules
+cookie.json
+token.txt
+server.log
+server.pid
+url-connettore.txt
+.DS_Store
+config.json
