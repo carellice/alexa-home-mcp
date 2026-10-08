@@ -146,7 +146,7 @@ Ferma prima il server avviato a mano (Ctrl+C).
 
 **Mac**
 
-1. **Server**: doppio click su `avvia.command`. Se macOS lo blocca: tasto destro → Apri. Lo script registra da solo il servizio di avvio automatico (`~/Library/LaunchAgents/com.claude-alexa.server.plist`) con i percorsi giusti. Se sposti la cartella, usa `ferma.command` e poi di nuovo `avvia.command`.
+1. **Server**: doppio click su `avvia.command`. Se macOS lo blocca: tasto destro → Apri. Lo script registra da solo il servizio di avvio automatico (`~/Library/LaunchAgents/com.claude-alexa.server.plist`) con i percorsi giusti. Lo script attiva anche Tailscale Funnel, se non lo è già. Se sposti la cartella, rilancia `avvia.command`. La cartella non deve stare in Scrivania, Documenti o Download: macOS impedisce ai servizi di leggerle e il server non partirebbe.
 2. **Tailscale**: icona di Tailscale nella barra dei menu → Impostazioni → attiva l'avvio al login. Funnel (passo 5) riparte insieme a Tailscale, non va rilanciato.
 3. **Accesso automatico**: il server parte al login, non all'accensione. Se il Mac si riavvia da solo (aggiornamento, blackout) resta fermo alla schermata di accesso. Per evitarlo: Impostazioni di Sistema → Utenti e gruppi → **Accedi automaticamente come**. L'opzione non è disponibile con FileVault attivo.
 4. **Niente stop**: Impostazioni di Sistema → Energia (sui portatili: Batteria → Opzioni) → attiva **Impedisci lo stop automatico quando il monitor è spento** e, se presente, **Riavvia automaticamente dopo un'interruzione di corrente**. In alternativa, da terminale:
@@ -165,7 +165,7 @@ Ferma prima il server avviato a mano (Ctrl+C).
    schtasks /create /tn "ClaudeAlexa" /sc onlogon /tr "C:\percorso\claude-alexa\avvia.bat auto"
    ```
 
-   Poi doppio click su `avvia.bat`. Per togliere l'avvio automatico: `schtasks /delete /tn "ClaudeAlexa" /f`.
+   Poi doppio click su `avvia.bat`, che attiva anche Tailscale Funnel se non lo è già. Per togliere l'avvio automatico: `schtasks /delete /tn "ClaudeAlexa" /f`.
 2. **Tailscale**: parte già da solo come servizio di Windows. Per tenerlo connesso anche prima del login: icona di Tailscale nell'area di notifica → Preferences → **Run unattended**. Funnel (passo 5) riparte insieme a Tailscale.
 3. **Accesso automatico**: il server parte al login, non all'accensione. Premi Win+R, scrivi `netplwiz`, togli la spunta da **Per utilizzare questo computer è necessario che l'utente immetta il nome e la password** e conferma con la password. Se la spunta non compare, disattiva prima l'accesso con Windows Hello in Impostazioni → Account → Opzioni di accesso.
 4. **Niente sospensione**: Impostazioni → Sistema → Alimentazione → Schermo e sospensione → sospensione **Mai** quando è collegato alla corrente. In alternativa, da PowerShell:

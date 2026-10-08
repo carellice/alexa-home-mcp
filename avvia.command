@@ -1,5 +1,5 @@
 #!/bin/zsh
-# Avvia il servizio e lo registra per partire da solo al login del Mac
+# Avvia (o riavvia) il servizio, lo registra per partire da solo al login del Mac e attiva Tailscale Funnel
 cd "$(dirname "$0")"
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 LABEL="com.claude-alexa.server"
@@ -7,9 +7,9 @@ PLIST="$HOME/Library/LaunchAgents/$LABEL.plist"
 # Il log sta fuori dalla cartella: macOS impedisce ai servizi di scrivere in Scrivania e Documenti
 LOG="$HOME/Library/Logs/claude-alexa.log"
 
-if launchctl print "gui/$(id -u)/$LABEL" >/dev/null 2>&1; then
-    echo "Il server è già attivo."
-    exit 0
+# Toglie la registrazione precedente: può puntare a una cartella che non esiste più
+if launchctl bootout "gui/$(id -u)/$LABEL" 2>/dev/null; then
+    while launchctl print "gui/$(id -u)/$LABEL" >/dev/null 2>&1; do sleep 1; done
 fi
 
 NODE="$(command -v node)"
@@ -53,8 +53,24 @@ launchctl bootstrap "gui/$(id -u)" "$PLIST" || exit 1
 sleep 8
 
 if grep -q "Alexa collegata" "$LOG"; then
-    echo "Server avviato e Alexa collegata. Puoi chiudere questa finestra."
+    echo "Server avviato e Alexa collegata."
+elif grep -q "EPERM" "$LOG"; then
+    echo "Il server non parte: macOS impedisce ai servizi di leggere Scrivania, Documenti e Download."
+    echo "Sposta la cartella altrove (per esempio in $HOME) e rilancia questo script."
 else
     echo "Server avviato, ma Alexa non è collegata:"
     cat "$LOG"
 fi
+
+# Tailscale Funnel: rende il server raggiungibile da internet. Resta attivo anche dopo i riavvii
+TS="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
+[[ -x "$TS" ]] || TS="$(command -v tailscale)"
+if [[ -z "$TS" ]]; then
+    echo "Tailscale non trovato: installalo da https://tailscale.com/download"
+    exit 1
+fi
+if ! "$TS" funnel status 2>/dev/null | grep -q "127.0.0.1:3000"; then
+    "$TS" funnel --bg 3000 || { echo "Funnel non attivato: controlla che Tailscale sia aperto e connesso."; exit 1; }
+fi
+echo "Funnel attivo: $("$TS" funnel status 2>/dev/null | grep -m1 -o 'https://[^ ]*')"
+echo "Puoi chiudere questa finestra."

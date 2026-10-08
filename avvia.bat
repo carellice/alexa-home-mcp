@@ -6,7 +6,7 @@ cd /d "%~dp0"
 netstat -ano | findstr /r /c:":3000 .*LISTENING" >nul
 if not errorlevel 1 (
     echo Il server e' gia' attivo.
-    goto fine
+    goto funnel
 )
 
 where node >nul 2>&1
@@ -23,7 +23,23 @@ if errorlevel 1 (
     echo Server avviato, ma Alexa non e' collegata:
     type server.log
 ) else (
-    echo Server avviato e Alexa collegata. Puoi chiudere questa finestra.
+    echo Server avviato e Alexa collegata.
+)
+
+:funnel
+rem Tailscale Funnel: rende il server raggiungibile da internet. Resta attivo anche dopo i riavvii
+where tailscale >nul 2>&1
+if errorlevel 1 (
+    echo Tailscale non trovato: installalo da https://tailscale.com/download
+    goto fine
+)
+tailscale funnel status 2>nul | findstr /c:"127.0.0.1:3000" >nul
+if errorlevel 1 tailscale funnel --bg 3000
+tailscale funnel status 2>nul | findstr /c:"127.0.0.1:3000" >nul
+if errorlevel 1 (
+    echo Funnel non attivato: controlla che Tailscale sia aperto e connesso.
+) else (
+    echo Funnel attivo. Puoi chiudere questa finestra.
 )
 
 :fine
